@@ -19,7 +19,7 @@ env:
  BUCKET_TF_STATE: ${{ secrets.BUCKET_TF_STATE }}
  EKS_CLUSTER: gitops-app
 
- jobs:
+jobs:
    terraform:
      name: "APPLY TERRAFORM CODE CHANGES"
      runs-on: ubuntu-latest

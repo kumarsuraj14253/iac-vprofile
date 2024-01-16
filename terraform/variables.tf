@@ -1,4 +1,4 @@
-variable "region" {
+variable "aws-region" {
   description = "AWS EKS Cluster Region"
   type        = string
   default     = "ap-southeast-1"

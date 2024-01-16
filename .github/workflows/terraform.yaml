@@ -1,0 +1,59 @@
+name: "GITOPSAPP IAC"
+on:
+  push:
+    branches:
+      - main
+      - stage
+    paths:
+      - terraform/**
+  pull_request:
+    branches:
+      - main
+    paths:
+      - terraform/**
+
+env:
+ ## Credentials for Deployment to AWS
+ AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+ AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+ BUCKET_TF_STATE: ${{ secrets.BUCKET_TF_STATE }}
+ EKS_CLUSTER: gitops-app
+
+ jobs:
+   terraform:
+     name: "APPLY TERRAFORM CODE CHANGES"
+     runs-on: ubuntu-latest
+     defaults:
+       run:
+         shell: bash
+         working-directory: ./terraform
+        
+     steps:
+       - name: "CHECKOUT SOURCE CODE"
+         uses: actions/checkout@v4
+
+       - name: SETUP TERRAFORM WITH SPECIFIED VERSION ON THE RUNNER
+         uses: hashicorp/setup-terraform@v3
+         ##with:
+           ##terraform_version: "1.1.7"
+
+       - name: Terraform init
+         id: init
+         run: terraform init -backend-config="bucket=$BUCKET_TF_STATE"
+
+       - name: Terraform Format
+         id: fmt
+         run: terraform fmt -check
+
+       - name: Terraform Validate
+         id: validate
+         run: terraform validate
+
+       - name: Terraform Plan
+         id: plan
+         run: terraform plan -no-color -input=false -out planfile
+         continue-on-error: true
+
+       - name: Terraform Plan Status
+         if: steps.plan.outcome == 'failure'
+         run: exit 1

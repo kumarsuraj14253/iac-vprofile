@@ -1,5 +1,5 @@
 variable "region" {
-  description = "AWS region"
+  description = "AWS EKS Cluster Region"
   type        = string
   default     = "ap-southeast-1"
 }
@@ -10,4 +10,3 @@ variable "clusterName" {
   default     = "gitops-app"
 }
 
-####
